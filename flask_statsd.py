@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import time
-import urllib
 
 from flask import request, current_app
 import statsd
@@ -37,17 +36,20 @@ class Statsd(object):
 
         self.client.timing(
             stat = metric_name,
-            delta = time.time() - getattr(request, self.START_TIME_ATTR)
-            rate = current_app.config['STATSD_RATE'])
+            delta = time.time() - getattr(request, self.START_TIME_ATTR),
+            rate = current_app.config['STATSD_RATE']
+        )
 
         self.client.incr(
             stat = metric_name,
-            count = int(1 / current_app.config['STATSD_RATE'])
+            count = int(1 / current_app.config['STATSD_RATE']),
             rate = current_app.config['STATSD_RATE']
-            )
+        )
+
+        return response
 
     def _before_request(self):
-        setattr(request, self.START_TIME_ATTR = time.time())
+        setattr(request, self.START_TIME_ATTR, time.time())
 
     def _metric_name(self, prefix="request_handlers", suffix=None):
         '''
@@ -55,9 +57,8 @@ class Statsd(object):
         It unquotes the url, removes trailing slash, and converts
         slashes and whitespace to dashes.
         '''
-        metric_name = urllib.unquote(request.path) \
-                            .replace(" ","") \
-                            .replace("/", "-")
+        metric_name = request.endpoint
+
         if prefix:
             metric_name = "%s.%s" % (prefix, metric_name)
         if suffix:
@@ -68,7 +69,7 @@ class Statsd(object):
     @property
     def client(self):
         if not self._client:
-            self._client = StatsClient(
+            self._client = statsd.StatsClient(
                 current_app.config['STATSD_HOST'],
                 current_app.config['STATSD_PORT'],
                 current_app.config['STATSD_PREFIX']
