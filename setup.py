@@ -10,7 +10,7 @@ from setuptools import setup
 
 setup(
     name='Flask-Statsd-Ext',
-    version='0.0.2a',
+    version='0.0.2a1',
     url='http://nilas.com',
     author='Rob McQueen',
     author_email='rob@nilas.com',
