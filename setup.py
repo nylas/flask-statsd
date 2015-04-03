@@ -9,8 +9,8 @@ from setuptools import setup
 
 
 setup(
-    name='Flask-Statsd',
-    version='1.0',
+    name='Flask-Statsd-Ext',
+    version='0.0.2a',
     url='http://nilas.com',
     author='Rob McQueen',
     author_email='rob@nilas.com',

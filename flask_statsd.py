@@ -111,8 +111,9 @@ class Statsd(object):
     ###
     def _after_request(self, response):
         if not hasattr(request, self.START_TIME_ATTR) or \
-           current_app.config['STATSD_RATE'] == 0:
-            return
+           current_app.config['STATSD_RATE'] == 0 or \
+           not request.endpoint:
+            return response
 
         metric_name = ".".join(["request_handlers",
                                 request.endpoint,
