@@ -33,25 +33,30 @@ class FlaskStatsdTestCase(unittest.TestCase):
                 mock.call(count=1, stat='myapp.request_handlers.index.200', rate=1)
             ]
 
-            mock_client.timing.assert_called_with(
+            mock_client.timing.assert_any_call(
                 stat = 'myapp.request_handlers.index.200',
                 delta = mock.ANY,
                 rate = mock.ANY)
 
-            mock_client.timer.assert_called_with(
+            mock_client.timer.assert_any_call(
                 stat = 'myapp.test_timer',
+                rate = mock.ANY)
+
+            mock_client.timing.assert_any_call(
+                stat = 'myapp.request_handlers.overall.200',
+                delta = mock.ANY,
                 rate = mock.ANY)
 
     def test_failed_response(self):
         with mock.patch('flask_statsd.Statsd._client') as mock_client:
             self.test_client.get("/fail")
 
-            mock_client.incr.assert_called_with(
+            mock_client.incr.assert_any_call(
                 stat = 'myapp.request_handlers.fail.500',
                 count = 1,
                 rate = mock.ANY)
 
-            mock_client.timing.assert_called_with(
+            mock_client.timing.assert_any_call(
                 stat = 'myapp.request_handlers.fail.500',
                 delta = mock.ANY,
                 rate = mock.ANY)

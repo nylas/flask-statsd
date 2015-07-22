@@ -5,6 +5,7 @@ import time
 from flask import request, current_app
 import statsd
 
+
 class Statsd(object):
     '''Statsd Extension for Flask
 
@@ -64,11 +65,10 @@ class Statsd(object):
     # Main Interface (proxy commands to pystatsd)
     ###
 
-
     def timer(self, stat, rate=None):
         return self._client.timer(
-            rate = rate or current_app.config['STATSD_RATE'],
-            stat = self._metric_name(stat)
+            rate=rate or current_app.config['STATSD_RATE'],
+            stat=self._metric_name(stat)
         )
 
     def timing(self, stat, delta, rate=None):
@@ -115,15 +115,18 @@ class Statsd(object):
            not request.endpoint:
             return response
 
-        metric_name = ".".join(["request_handlers",
-                                request.endpoint,
-                                str(response.status_code)])
+        metrics = [
+            ".".join(["request_handlers", request.endpoint,
+                      str(response.status_code)]),
+            ".".join(["request_handlers", "overall", str(response.status_code)])
+        ]
 
-        self.timing(
-            metric_name,
-            int((time.time() - getattr(request, self.START_TIME_ATTR))*1000)
-        )
-        self.incr(metric_name)
+        for metric_name in metrics:
+            self.timing(
+                metric_name,
+                int((time.time() - getattr(request, self.START_TIME_ATTR))*1000)
+            )
+            self.incr(metric_name)
 
         return response
 
