@@ -73,16 +73,16 @@ class Statsd(object):
 
     def timing(self, stat, delta, rate=None):
         return self._client.timing(
-            rate = rate or current_app.config['STATSD_RATE'],
-            delta = delta,
-            stat = self._metric_name(stat)
+            rate=rate or current_app.config['STATSD_RATE'],
+            delta=delta,
+            stat=self._metric_name(stat)
         )
 
     def incr(self, stat, count=1, rate=None):
         return self._client.incr(
-            rate = rate or current_app.config['STATSD_RATE'],
-            count = count,
-            stat = self._metric_name(stat)
+            rate=rate or current_app.config['STATSD_RATE'],
+            count=count,
+            stat=self._metric_name(stat)
         )
 
     def decr(self, stat, count=1, rate=None):
@@ -105,7 +105,6 @@ class Statsd(object):
             )
         return self.__client
 
-
     ###
     # REQUEST HANDLER FUNCTIONALITY
     ###
@@ -118,13 +117,15 @@ class Statsd(object):
         metrics = [
             ".".join(["request_handlers", request.endpoint,
                       str(response.status_code)]),
-            ".".join(["request_handlers", "overall", str(response.status_code)])
+            ".".join(["request_handlers", "overall",
+                      str(response.status_code)])
         ]
 
         for metric_name in metrics:
             self.timing(
                 metric_name,
-                int((time.time() - getattr(request, self.START_TIME_ATTR))*1000)
+                int((time.time() -
+                     getattr(request, self.START_TIME_ATTR))*1000)
             )
             self.incr(metric_name)
 
